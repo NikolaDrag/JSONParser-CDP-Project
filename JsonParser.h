@@ -5,11 +5,11 @@
 
 class JsonParser {
 private:
-    std::string jsonInput;
+    string jsonInput;
     unsigned int position;
 
 public:
-    JsonParser(std::string &jsonToParse);
+    JsonParser(string &jsonToParse);
 
     JsonValue parse();
 

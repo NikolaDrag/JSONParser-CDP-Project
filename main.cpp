@@ -4,7 +4,7 @@
 
 using std::stack;
 using std::cin;
-using std::cout;
+
 
 int main(){
     //1vi char sled ( e 'space', toest na position[0]
@@ -53,7 +53,7 @@ int main(){
     JsonParser JsonParser2(jsonInput2);
     JsonParser2.parse();
     /*
-    Notes: 1. parsing for legitamte input works, but care how "" are entered from user input with escape signs or not
+    Notes: 1. parsing for legitamate input works, but care how "" are entered from user input with escape signs or not
     */
     return 0;
 }

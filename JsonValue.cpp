@@ -51,3 +51,32 @@ JsonObject JsonValue::getObjectval() const {
 JsonArray JsonValue::getArrayval() const {
     return arrayVal;
 }
+
+void JsonValue::print() const{ //pass the command
+    if(typeToParse == STRING){
+        cout << stringVal << endl;
+    }
+    if(typeToParse == NUMBER){
+        cout << std::to_string(numberVal) << endl;
+    }
+    if(typeToParse == BOOLEAN){
+        cout << std::boolalpha << boolVal << endl;
+    }
+    if(typeToParse == NULLVAL){
+        cout << "null" << endl;
+    }
+    if(typeToParse == OBJECT){
+        for (auto it = objectVal.begin(); it != objectVal.end(); ++it) {
+        cout << "Key: " << it->first << ", Value: ";
+        it->second.print();
+        cout << endl;
+        }
+    }
+    if(typeToParse == ARRAY){
+        for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
+        it->print();
+        cout << endl;
+        }
+    }
+    return;
+}

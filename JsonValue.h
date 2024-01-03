@@ -9,6 +9,8 @@
 using std::string;
 using std::vector;
 using std::map;
+using std::cout;
+using std::endl;
 
 class JsonValue;
 
@@ -37,12 +39,13 @@ public:
 
     void setTypeToParse(Type typeVal);
     Type getTypeval() const;
-    std::string getStringval() const;
+    string getStringval() const;
     double getNumberval() const;
     bool getBoolval() const;
     JsonObject getObjectval() const;
     JsonArray getArrayval() const;
 
+    void print() const;
 private:
     Type typeToParse;
     std::string stringVal;

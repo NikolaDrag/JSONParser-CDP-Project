@@ -1,8 +1,7 @@
 #include "JsonParser.h"
 
-
 using std::cerr;
-using std::endl;
+
 
 bool isDigit(char chr){
     if(chr >= '0' && chr <= '9'){
@@ -12,7 +11,7 @@ bool isDigit(char chr){
     }
 }
 
-JsonParser::JsonParser(std::string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
+JsonParser::JsonParser(string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
 
 JsonValue JsonParser::parse() {
      skipSpaces();
