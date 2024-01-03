@@ -15,32 +15,32 @@ using std::endl;
 
 class JsonValue;
 
-typedef map<string, JsonValue> JsonObject; //is vector has 1 Element it is string,number,boolean,null, otherwise its an array
+typedef map<string, JsonValue> JsonObject; //if vector has 1 Element it is string,number,boolean,null, otherwise its an array
 typedef vector<JsonValue> JsonArray;
 
 class JsonValue { //izpolzva se za jsonObject i JsonArray
 public:
     JsonValue(){
-        typeToParse = NULLVAL;
+        //typeToParse = NULLVAL;
     }
     JsonValue(const string &inputStr) : stringVal(inputStr){
-        typeToParse = STRING;
+        //typeToParse = STRING;
     }
     JsonValue(const double &inputNumber) : numberVal(inputNumber){
-        typeToParse = NUMBER;
+       // typeToParse = NUMBER;
     }
     JsonValue(const bool &inputBool) : boolVal(inputBool){
-        typeToParse = BOOLEAN;
+        //typeToParse = BOOLEAN;
     }
     JsonValue(const JsonObject& inputObj) : objectVal(inputObj){
-        typeToParse = OBJECT;
+        //typeToParse = OBJECT;
     }
     JsonValue(const JsonArray & inputArr) : arrayVal(inputArr){
-        typeToParse = ARRAY;
+        //typeToParse = ARRAY;
     }
     JsonValue& operator=(const JsonValue& other) {
         if (this != &other) {
-            typeToParse = other.typeToParse;
+            //typeToParse = other.typeToParse;
             stringVal = other.stringVal;
             numberVal = other.numberVal;
             boolVal = other.boolVal;
@@ -50,15 +50,15 @@ public:
         return *this;
     }
 //private: later getters
-    enum Type {
+   /* enum Type {
         NULLVAL,
         STRING,
         NUMBER,
         BOOLEAN,
         OBJECT,
         ARRAY
-    };
-    Type typeToParse;
+    };*/
+    //Type typeToParse;
     string stringVal;
     double numberVal;
     bool boolVal;
@@ -73,6 +73,7 @@ bool isDigit(char chr){
         return false;
     }
 }
+
 class JsonParser{
 
 private:
@@ -97,9 +98,9 @@ public:
         case 'f':
             return parseBool();
             break;
-        /*case '[':
-            parseArray();
-            break;*/
+        case '[':
+            return parseArray();
+            break;
         case 'n':
             return parseNull();
             break;
@@ -173,6 +174,7 @@ private:
             }
             position++; // za }
         }
+        checkIfCommaIsLegit();
         return jsonObj;
     }
 
@@ -180,6 +182,10 @@ private:
         string k ="";
         position++; // minavame  purvoto "
         while(jsonInput[position] != '"'){
+            if(jsonInput[position] == '\\'){
+                position++;
+                escapeCharCare();
+            }
             k.push_back(jsonInput[position]);
             position++;
         }
@@ -192,12 +198,37 @@ private:
         string s ="";
         position++; // minavame  purvoto "
         while(jsonInput[position] != '"'){
+            if(jsonInput[position] == '\\'){
+                position++;
+                escapeCharCare();
+            }
             s.push_back(jsonInput[position]);
             position++;
         }
         position++; //second "
         checkIfCommaIsLegit(); //za , !!! ima zapetaq sled posleden element ili ima skoba sled zapetaq
         return JsonValue(s);
+    }
+
+    void escapeCharCare(){ //c++ will notice only the manualy entered \ not the automatic ones that we put with R"
+        if(jsonInput[position] == '"' || jsonInput[position] == '/' || jsonInput[position] == 'r' || jsonInput[position] == 'b' || jsonInput[position] == 'f' || jsonInput[position] == 'n' ||
+        jsonInput[position] == 't' || jsonInput[position] == '\\'){
+            position++;
+            return;
+        }
+        if(jsonInput[position] == 'u'){
+            position++;
+            for(int i=0;i< 4;i++){
+                if((jsonInput[position] >= '0' && jsonInput[position]<= '9') || (jsonInput[position] >= 'A' && jsonInput[position]<= 'F')){
+                    position++;
+                }else{
+                    throw std::invalid_argument("Invalid hexadecimal digit at position: " + std::to_string(position) + ".");
+                    return;
+                }
+            }
+        }
+        throw std::invalid_argument("Invalid character after escape symbol \\ at position: " + std::to_string(position) + ".");
+        return;
     }
 
     JsonValue parseNull(){
@@ -239,19 +270,67 @@ private:
             return JsonValue();
         }
     }
+
+    JsonValue parseArray(){
+        position++; //for opening [
+        JsonArray arr;
+        while(jsonInput[position] != ']'){
+            arr.push_back(parse());
+        }
+        position++; //for closing ]
+        checkIfCommaIsLegit(); 
+        return arr;
+    }
 };
 
 int main(){
     //1vi char sled ( e 'space', toest na position[0]
-    string jsonInput = R"( {"name": "John Doe",
+    string jsonInput1 = R"( {"name": "John Doe",
     "age": -30.90,
     "languages": "English"} )";
-    JsonParser JsonParser1(jsonInput);
+    JsonParser JsonParser1(jsonInput1);
     JsonParser1.parse();
-    //cout << jsonInput[43];
+
+    string jsonInput2 = R"({
+   "name":"ACME Software Co.",
+   "type":"Software Development Company",
+   "offices": [
+               {
+                   "name":"Headquarters",
+                   "address":"Sofia"
+               },
+               {
+                   "name":"Front Office",
+                   "address":"New York City"
+               }
+              ],
+   "members":[
+               {   
+                   "id" : "0",
+                   "name" : "John Smith",
+                   "birthdate" : "1980-01-01"
+               },
+               {
+                   "id" : "1",
+                   "name" : "Jane Smith",
+                   "birthdate" : "1981-02-02"
+               },
+               {
+                   "id" : "2",
+                   "name" : "John Doe",
+                   "birthdate" : "1982-03-03"
+               }
+           ],
+   "management":{
+                   "directorId":"0",
+                   "presidentId":"1"
+                }
+ }
+)";
+    JsonParser JsonParser2(jsonInput2);
+    JsonParser2.parse();
     /*
-    Notes: Works - checkcomma,skipspaces, parseString,Bool,Key,Null
-    ParseObject needs to work for other types apart from strings, after we parse he key
+    Notes: 1. parsing for legitamte input works, but care how "" are entered from user input with escape signs or not
     */
     return 0;
 }
