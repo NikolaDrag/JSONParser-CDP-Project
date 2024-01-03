@@ -1,70 +1,8 @@
-#include <iostream>
-#include <map>
-#include <vector>
-#include <string>
-#include <stack>
+#include "JsonParser.h"
 
-using std::string;
-using std::vector;
-using std::map;
-using std::stack;
-using std::cin;
-using std::cout;
+
 using std::cerr;
 using std::endl;
-
-class JsonValue;
-
-typedef map<string, JsonValue> JsonObject; //if vector has 1 Element it is string,number,boolean,null, otherwise its an array
-typedef vector<JsonValue> JsonArray;
-
-class JsonValue { //izpolzva se za jsonObject i JsonArray
-public:
-    JsonValue(){
-        //typeToParse = NULLVAL;
-    }
-    JsonValue(const string &inputStr) : stringVal(inputStr){
-        //typeToParse = STRING;
-    }
-    JsonValue(const double &inputNumber) : numberVal(inputNumber){
-       // typeToParse = NUMBER;
-    }
-    JsonValue(const bool &inputBool) : boolVal(inputBool){
-        //typeToParse = BOOLEAN;
-    }
-    JsonValue(const JsonObject& inputObj) : objectVal(inputObj){
-        //typeToParse = OBJECT;
-    }
-    JsonValue(const JsonArray & inputArr) : arrayVal(inputArr){
-        //typeToParse = ARRAY;
-    }
-    JsonValue& operator=(const JsonValue& other) {
-        if (this != &other) {
-            //typeToParse = other.typeToParse;
-            stringVal = other.stringVal;
-            numberVal = other.numberVal;
-            boolVal = other.boolVal;
-            objectVal = other.objectVal;
-            arrayVal = other.arrayVal;
-        }
-        return *this;
-    }
-//private: later getters
-   /* enum Type {
-        NULLVAL,
-        STRING,
-        NUMBER,
-        BOOLEAN,
-        OBJECT,
-        ARRAY
-    };*/
-    //Type typeToParse;
-    string stringVal;
-    double numberVal;
-    bool boolVal;
-    JsonObject objectVal;
-    JsonArray arrayVal;
-};
 
 bool isDigit(char chr){
     if(chr >= '0' && chr <= '9'){
@@ -74,16 +12,10 @@ bool isDigit(char chr){
     }
 }
 
-class JsonParser{
+JsonParser::JsonParser(std::string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
 
-private:
-    string jsonInput;
-    unsigned int position;
-public:
-    JsonParser(string &jsonToParse):jsonInput(jsonToParse),position(0){}
-
-    JsonValue parse(){
-        skipSpaces();
+JsonValue JsonParser::parse() {
+     skipSpaces();
         if(isDigit(jsonInput[position]) || jsonInput[position] == '-'){
             return parseNumber();
         }
@@ -109,29 +41,28 @@ public:
             return JsonValue("");
             break;
         default:
-            //cerr << "Invalid input: unexpected character '" << jsonInput[position] << "' at position " << position << endl;
+            cerr << "Invalid input: unexpected character '" << jsonInput[position] << "' at position " << position << endl;
             throw std::invalid_argument("Invalid input: unexpected character at position " + std::to_string(position) + ".");
             break;
         }
-    }
+}
 
-private:
-    bool isWhitespace(char c) {
-        return (c == ' ' || c == '\t' || c == '\n' || c == '\r'); //ensure we skip newlines, tabs and other nonessential charecters
-    }
+bool JsonParser::isWhitespace(char c) {
+   return (c == ' ' || c == '\t' || c == '\n' || c == '\r'); //ensure we skip newlines, tabs and other nonessential charecters
+}
 
-    void skipSpaces(){
-        if(jsonInput[position] == 0){
+void JsonParser::skipSpaces() {
+    if(jsonInput[position] == 0){
             return;
         }
         while(isWhitespace(jsonInput[position])){ //we go to the next position that isnt a whitespace
             position++;
         }
         return;
-    }
+}
 
-    bool checkIfCommaIsLegit(){
-        skipSpaces();
+bool JsonParser::checkIfCommaIsLegit() {
+    skipSpaces();
         if(jsonInput[position] == ','){
             position++; //skip the ,
             skipSpaces();
@@ -147,10 +78,10 @@ private:
             }
         }
         return true;
-    }
+}
 
-    JsonValue parseObject(){
-        JsonObject jsonObj;
+JsonValue JsonParser::parseObject() {
+    JsonObject jsonObj;
         position++; //za {
         skipSpaces();
         if(jsonInput[position] != '"' && jsonInput[position] != '}'){
@@ -162,7 +93,7 @@ private:
             while(jsonInput[position] != '}'){
                 skipSpaces(); //not needed the first time but it will exit instantly
                 string key="";
-                key = parseKey().stringVal; //increases the position as well
+                key = parseKey().getStringval(); //increases the position as well
                 skipSpaces();
                 if(jsonInput[position] == ':'){
                     position++; //za :
@@ -176,10 +107,10 @@ private:
         }
         checkIfCommaIsLegit();
         return jsonObj;
-    }
+}
 
-    JsonValue parseKey(){
-        string k ="";
+JsonValue JsonParser::parseKey() {
+     string k ="";
         position++; // minavame  purvoto "
         while(jsonInput[position] != '"'){
             if(jsonInput[position] == '\\'){
@@ -192,10 +123,10 @@ private:
         position++; //second "
         //za key nqmame , sled tova imame :
         return JsonValue(k);
-    }
+}
 
-    JsonValue parseString(){
-        string s ="";
+JsonValue JsonParser::parseString() {
+    string s ="";
         position++; // minavame  purvoto "
         while(jsonInput[position] != '"'){
             if(jsonInput[position] == '\\'){
@@ -208,10 +139,10 @@ private:
         position++; //second "
         checkIfCommaIsLegit(); //za , !!! ima zapetaq sled posleden element ili ima skoba sled zapetaq
         return JsonValue(s);
-    }
+}
 
-    void escapeCharCare(){ //c++ will notice only the manualy entered \ not the automatic ones that we put with R"
-        if(jsonInput[position] == '"' || jsonInput[position] == '/' || jsonInput[position] == 'r' || jsonInput[position] == 'b' || jsonInput[position] == 'f' || jsonInput[position] == 'n' ||
+void JsonParser::escapeCharCare() { //c++ will notice only the manualy entered \ not the automatic ones that we put with R"
+   if(jsonInput[position] == '"' || jsonInput[position] == '/' || jsonInput[position] == 'r' || jsonInput[position] == 'b' || jsonInput[position] == 'f' || jsonInput[position] == 'n' ||
         jsonInput[position] == 't' || jsonInput[position] == '\\'){
             position++;
             return;
@@ -229,18 +160,18 @@ private:
         }
         throw std::invalid_argument("Invalid character after escape symbol \\ at position: " + std::to_string(position) + ".");
         return;
-    }
+}
 
-    JsonValue parseNull(){
-        if (jsonInput.substr(position, 4) == "null") {
+JsonValue JsonParser::parseNull() {
+     if (jsonInput.substr(position, 4) == "null") {
             position += 4; // move the position after "null"
         }
         checkIfCommaIsLegit();
         return JsonValue();
-    }
+}
 
-    JsonValue parseNumber(){
-        bool hadDot = false;
+JsonValue JsonParser::parseNumber() {
+     bool hadDot = false;
         string number = "";
         while (isDigit(jsonInput[position]) || jsonInput[position] == '.' || jsonInput[position] == '-' || jsonInput[position] == 'e' || 
         jsonInput[position] == '+' || jsonInput[position] == 'E'){
@@ -254,10 +185,10 @@ private:
         checkIfCommaIsLegit();
         double numberVal = std::stod(number); //stod will throw exeption by itself
         return JsonValue(numberVal);
-    }
+}
 
-    JsonValue parseBool() {
-        if (jsonInput.substr(position, 4) == "true") {
+JsonValue JsonParser::parseBool() {
+    if (jsonInput.substr(position, 4) == "true") {
             position += 4; // move the position after "true"
             checkIfCommaIsLegit();
             return JsonValue(true);
@@ -269,68 +200,15 @@ private:
            throw std::invalid_argument("Invalid boolean value at position " + std::to_string(position) + ".");
             return JsonValue();
         }
-    }
+}
 
-    JsonValue parseArray(){
-        position++; //for opening [
-        JsonArray arr;
+JsonValue JsonParser::parseArray() {
+   position++; //for opening [
+        JsonValue arr;
         while(jsonInput[position] != ']'){
-            arr.push_back(parse());
+            arr.getArrayval().push_back(parse());
         }
         position++; //for closing ]
         checkIfCommaIsLegit(); 
         return arr;
     }
-};
-
-int main(){
-    //1vi char sled ( e 'space', toest na position[0]
-    string jsonInput1 = R"( {"name": "John Doe",
-    "age": -30.90,
-    "languages": "English"} )";
-    JsonParser JsonParser1(jsonInput1);
-    JsonParser1.parse();
-
-    string jsonInput2 = R"({
-   "name":"ACME Software Co.",
-   "type":"Software Development Company",
-   "offices": [
-               {
-                   "name":"Headquarters",
-                   "address":"Sofia"
-               },
-               {
-                   "name":"Front Office",
-                   "address":"New York City"
-               }
-              ],
-   "members":[
-               {   
-                   "id" : "0",
-                   "name" : "John Smith",
-                   "birthdate" : "1980-01-01"
-               },
-               {
-                   "id" : "1",
-                   "name" : "Jane Smith",
-                   "birthdate" : "1981-02-02"
-               },
-               {
-                   "id" : "2",
-                   "name" : "John Doe",
-                   "birthdate" : "1982-03-03"
-               }
-           ],
-   "management":{
-                   "directorId":"0",
-                   "presidentId":"1"
-                }
- }
-)";
-    JsonParser JsonParser2(jsonInput2);
-    JsonParser2.parse();
-    /*
-    Notes: 1. parsing for legitamte input works, but care how "" are entered from user input with escape signs or not
-    */
-    return 0;
-}
