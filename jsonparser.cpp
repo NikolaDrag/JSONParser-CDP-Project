@@ -2,7 +2,6 @@
 
 using std::cerr;
 
-
 bool isDigit(char chr){
     if(chr >= '0' && chr <= '9'){
         return true;
@@ -11,7 +10,23 @@ bool isDigit(char chr){
     }
 }
 
+JsonValue JsonParser::getStoredValues(){
+        return storedValues;
+}
+
 JsonParser::JsonParser(string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
+
+void JsonParser::parseAndStoreJsonValue() {
+    position =0;
+    JsonValue parsedValue = parse(); 
+    cout << parsedValue.getTypeval();
+    storedValues = parsedValue;
+    return;
+}
+
+void JsonParser::printStoredJsonValues() const {
+        storedValues.print();
+}
 
 JsonValue JsonParser::parse() {
      skipSpaces();
@@ -65,7 +80,7 @@ bool JsonParser::checkIfCommaIsLegit() {
         if(jsonInput[position] == ','){
             position++; //skip the ,
             skipSpaces();
-            if(jsonInput[position] == '}' || jsonInput[position] == ']' || jsonInput[position] == 0){ //if we have a comma and we end the input
+            if(jsonInput[position] == '}' || jsonInput[position] == ']' || jsonInput[position] == 0 || jsonInput[position] == ',' ){ //if we have a comma and we end the input or have another comma after it
                 throw std::invalid_argument("Invalid comma at position: " + std::to_string(position) + ".");
                 return false;
             }
@@ -90,6 +105,9 @@ JsonValue JsonParser::parseObject() {
             return jsonObj;
         }else{
             while(jsonInput[position] != '}'){
+                if(jsonInput[position] == 0){
+                    throw std::invalid_argument("Missing closing bracket for object at position: " + std::to_string(position) + ".");
+                }
                 skipSpaces(); //not needed the first time but it will exit instantly
                 string key="";
                 key = parseKey().getStringval(); //increases the position as well
@@ -101,12 +119,12 @@ JsonValue JsonParser::parseObject() {
                 }
                 skipSpaces();
                 jsonObj[key] = parse(); //parse the obj to the key it can be number,obj,arr and so on, checks for comma as well
-                jsonObj[key].print();
             }
             position++; // za }
         }
         checkIfCommaIsLegit();
-        return jsonObj;
+        JsonValue jsonObjToReturn(jsonObj);
+        return jsonObjToReturn;
 }
 
 JsonValue JsonParser::parseKey() {
@@ -165,6 +183,8 @@ void JsonParser::escapeCharCare() { //c++ will notice only the manualy entered \
 JsonValue JsonParser::parseNull() {
      if (jsonInput.substr(position, 4) == "null") {
             position += 4; // move the position after "null"
+        }else{
+            throw std::invalid_argument("Invalid nullvalue at position: " + std::to_string(position) + ".");
         }
         checkIfCommaIsLegit();
         return JsonValue();
@@ -192,24 +212,27 @@ JsonValue JsonParser::parseBool() {
             position += 4; // move the position after "true"
             checkIfCommaIsLegit();
             return JsonValue(true);
-        } else if (jsonInput.substr(position, 5) == "false") {
+    } else if (jsonInput.substr(position, 5) == "false") {
             position += 5; // move the position after "false"
             checkIfCommaIsLegit();
             return JsonValue(false);
         } else {
-           throw std::invalid_argument("Invalid boolean value at position " + std::to_string(position) + ".");
+            throw std::invalid_argument("Invalid boolean value at position " + std::to_string(position) + ".");
             return JsonValue();
         }
 }
 
 JsonValue JsonParser::parseArray() {
    position++; //for opening [
-        JsonValue arr;
-        arr.setTypeToParse(JsonValue::Type::ARRAY);
-        while(jsonInput[position] != ']'){
-            arr.getArrayval().push_back(parse());
+    JsonValue arr;
+    arr.setTypeToParse(JsonValue::Type::ARRAY);
+    while(jsonInput[position] != ']'){
+        if(jsonInput[position] == 0){
+            throw std::invalid_argument("Missing closing bracket for array at position: " + std::to_string(position) + ".");
         }
-        position++; //for closing ]
-        checkIfCommaIsLegit(); 
-        return arr;
+        arr.getArrayval().push_back(parse());
     }
+    position++; //for closing ]
+    checkIfCommaIsLegit(); 
+    return arr;
+}

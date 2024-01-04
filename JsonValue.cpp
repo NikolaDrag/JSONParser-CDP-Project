@@ -69,6 +69,7 @@ void JsonValue::print() const{ //pass the command
         cout << "{ " << endl;
         for (auto it = objectVal.begin(); it != objectVal.end(); ++it) {
             cout << "Key: " << it->first << ", Value: ";
+            cout << it->second.getTypeval();
             it->second.print();
             cout << endl;
         }
