@@ -15,17 +15,14 @@ public:
     JsonValue parse();
 
     JsonValue getStoredValues();
-    void parseAndStoreJsonValue();
-
-    void printStoredJsonValues() const;
 private:
     bool isWhitespace(char c);
     void skipSpaces();
-    bool checkIfCommaIsLegit();
+    //bool checkIfCommaIsLegit();
     JsonValue parseObject();
-    JsonValue parseKey();
+    string parseKey();
     JsonValue parseString();
-    void escapeCharCare();
+    void escapeCharCare(string & curString);
     JsonValue parseNull();
     JsonValue parseNumber();
     JsonValue parseBool();
