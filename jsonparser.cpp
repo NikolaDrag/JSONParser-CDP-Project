@@ -101,6 +101,7 @@ JsonValue JsonParser::parseObject() {
                 }
                 skipSpaces();
                 jsonObj[key] = parse(); //parse the obj to the key it can be number,obj,arr and so on, checks for comma as well
+                jsonObj[key].print();
             }
             position++; // za }
         }
@@ -204,6 +205,7 @@ JsonValue JsonParser::parseBool() {
 JsonValue JsonParser::parseArray() {
    position++; //for opening [
         JsonValue arr;
+        arr.setTypeToParse(JsonValue::Type::ARRAY);
         while(jsonInput[position] != ']'){
             arr.getArrayval().push_back(parse());
         }

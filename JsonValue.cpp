@@ -66,17 +66,23 @@ void JsonValue::print() const{ //pass the command
         cout << "null" << endl;
     }
     if(typeToParse == OBJECT){
+        cout << "{ " << endl;
         for (auto it = objectVal.begin(); it != objectVal.end(); ++it) {
-        cout << "Key: " << it->first << ", Value: ";
-        it->second.print();
-        cout << endl;
+            cout << "Key: " << it->first << ", Value: ";
+            it->second.print();
+            cout << endl;
         }
+        cout << "} " << endl;
     }
     if(typeToParse == ARRAY){
+        cout << " [" << endl;
         for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
-        it->print();
-        cout << endl;
+            it->print();
+            if(it != arrayVal.end()-1){
+                cout << "," << endl;
+            }
         }
+        cout << " ]" << endl;
     }
     return;
 }

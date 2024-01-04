@@ -29,7 +29,7 @@ public:
     };
 
     JsonValue();
-    JsonValue(const std::string& inputStr);
+    JsonValue(const string& inputStr);
     JsonValue(const double& inputNumber);
     JsonValue(const bool& inputBool);
     JsonValue(const JsonObject& inputObj);
@@ -37,6 +37,7 @@ public:
 
     JsonValue& operator=(const JsonValue& other);
 
+    void setJsonObject(const JsonObject& newObj);
     void setTypeToParse(Type typeVal);
     Type getTypeval() const;
     string getStringval() const;
@@ -48,7 +49,7 @@ public:
     void print() const;
 private:
     Type typeToParse;
-    std::string stringVal;
+    string stringVal;
     double numberVal;
     bool boolVal;
     JsonObject objectVal;
