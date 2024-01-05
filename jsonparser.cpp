@@ -2,7 +2,7 @@
 
 using std::cerr;
 
-bool isDigit(char chr){
+bool JsonParser::isDigit(char chr){
     if(chr >= '0' && chr <= '9'){
         return true;
     }else{
@@ -10,23 +10,64 @@ bool isDigit(char chr){
     }
 }
 
+JsonParser::JsonParser(string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
+
 JsonValue JsonParser::getStoredValues(){
-        return storedValues;
+    return storedValues;
 }
 
-void JsonParser::parseAndStoreJsonValue() {
+void JsonParser::parseAndStoreJsonValue() { //this parse should be used, so the normal parse() is liek a helper
     position =0;
-    JsonValue parsedValue = parse(); 
-    //cout << parsedValue.getTypeval();
-    storedValues = parsedValue;
+    JsonValue parsedValue; //for some readability
+    while(jsonInput[position] != 0){ // avoid extra text
+        parsedValue = parse();
+    }
+    storedValues = parsedValue; 
     return;
 }
 
 void JsonParser::printStoredJsonValues() const {
-        storedValues.print();
+    storedValues.print("\n");
 }
 
-JsonParser::JsonParser(string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
+void JsonParser::shortPrintStoredJsonValues() const {
+    storedValues.print("");
+}
+
+void JsonParser::exactPrintStoredJsonValues(const string & identation) const {
+    storedValues.exactPrint(identation);
+}
+
+void JsonParser::saveToJsonFile(const JsonValue& jsonData, string& fileName) {
+    std::ofstream outputFile;
+    if (std::ifstream(fileName)) { // Check if the file already exists
+        char choice1;
+        cout << "File already exists. Do you want to (O)verwrite or (C)hange the name? "; //console interface
+        cin >> choice1;
+        if (choice1 == 'C' || choice1 == 'c') {
+            cout << "Enter a new file name: ";
+            cin >> fileName;
+        }
+    }
+    outputFile.open(fileName);
+    if (!outputFile.is_open()) {
+        cerr << "Error opening file for writing: " << fileName << endl;
+        return;
+    }
+    char choice2;
+    cout << "Enter desired identation (L)ong and readable or (S)hort: "; //console interface
+    cin >> choice2;
+    std::streambuf* coutBuffer = cout.rdbuf();   // Redirect cout to the file
+    cout.rdbuf(outputFile.rdbuf());
+    if(choice2 == 'L' || choice2 == 'l'){
+        exactPrintStoredJsonValues("\n");
+    }else{ //if its 'S' or 's'
+        exactPrintStoredJsonValues("");
+    }
+    cout.rdbuf(coutBuffer);  // Restore cout to the original buffer
+    outputFile.close();
+}
+
 
 JsonValue JsonParser::parse() {
      skipSpaces();
@@ -114,6 +155,7 @@ JsonValue JsonParser::parseObject() {
         position++; //za zapetaq
         skipSpaces(); //sled zapetaq skipvame spaces za da zapochnem noviq kluch
     }
+    skipSpaces(); //for extra text
     return JsonValue(obj);
 }
 
@@ -151,7 +193,7 @@ JsonValue JsonParser::parseString() {
 }
 
 void JsonParser::escapeCharCare(string & curString) { //c++ will notice only the manualy entered \ not the automatic ones that we put with R"
-   if(jsonInput[position] == '"' || jsonInput[position] == '/' || jsonInput[position] == 'r' || jsonInput[position] == 'b' || jsonInput[position] == 'f' || jsonInput[position] == 'n' ||
+    if(jsonInput[position] == '"' || jsonInput[position] == '/' || jsonInput[position] == 'r' || jsonInput[position] == 'b' || jsonInput[position] == 'f' || jsonInput[position] == 'n' ||
         jsonInput[position] == 't' || jsonInput[position] == '\\'){ //ako e escape char
             curString.push_back(jsonInput[position]);
             position++;
@@ -234,5 +276,7 @@ JsonValue JsonParser::parseArray() {
         }
         position++; //skip ,
     }
+    skipSpaces(); //for extra text
     return JsonValue(arr);
 }
+

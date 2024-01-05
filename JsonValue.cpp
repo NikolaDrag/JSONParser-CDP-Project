@@ -52,39 +52,111 @@ JsonArray JsonValue::getArrayval() const {
     return arrayVal;
 }
 
-void JsonValue::print() const{ //pass the command
+void JsonValue::print(const string & identation) const{ //pass the command
     if(typeToParse == STRING){
-        cout << stringVal << endl;
+        cout << stringVal << identation;
     }
     if(typeToParse == NUMBER){
-        cout << std::to_string(numberVal) << endl;
+        cout << std::to_string(numberVal) << identation;
     }
     if(typeToParse == BOOLEAN){
-        cout << std::boolalpha << boolVal << endl;
+        cout << std::boolalpha << boolVal << identation;
     }
     if(typeToParse == NULLVAL){
-        cout << "null" << endl;
+        cout << "null" << identation;
     }
     if(typeToParse == OBJECT){
-        cout << "{ " << endl;
+        cout << "{ " << identation;
         //for (auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end(); ++it) {
         for(const auto& key : objectVal.keysOrder){
             cout << "Key: " <<  key << ", Value: ";
-            //cout << it->second.getTypeval();
-            objectVal.objectMap.at(key).print();
-            cout << endl;
+            objectVal.objectMap.at(key).print(identation);
         }
-        cout << "} " << endl;
+        cout << "} " << identation;
     }
     if(typeToParse == ARRAY){
-        cout << " [" << endl;
+        cout << "[" << identation;
         for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
-            it->print();
+            it->print(identation);
             if(it != arrayVal.end()-1){
-                cout << "," << endl;
+                cout << "," << identation;
             }
         }
-        cout << " ]" << endl;
+        cout << "]" << identation;
     }
     return;
 }
+
+void JsonValue::exactPrint(const string & identation) const{ //pass the command
+    if(typeToParse == STRING){
+        cout << "\"" << stringVal << "\"" << identation;
+    }
+    if(typeToParse == NUMBER){
+        cout << std::to_string(numberVal) << identation;
+    }
+    if(typeToParse == BOOLEAN){
+        cout << std::boolalpha << boolVal << identation;
+    }
+    if(typeToParse == NULLVAL){
+        cout << "null" << identation;
+    }
+    if(typeToParse == OBJECT){
+        cout << "{ " << identation;
+        int counter =0;
+        //for (auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end(); ++it) {
+        for(const auto& key : objectVal.keysOrder){
+            cout << "\"" <<  key << "\"" << ":";
+            objectVal.objectMap.at(key).exactPrint(identation);
+            if (++counter < objectVal.keysOrder.size()) {
+                cout << "," << identation;
+            }
+        }
+        cout << "} " << identation;
+    }
+    if(typeToParse == ARRAY){
+        cout << "[" << identation;
+        for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
+            it->exactPrint(identation);
+            if(it != arrayVal.end()-1){
+                cout << "," << identation;
+            }
+        }
+        cout << "]" << identation;
+    }
+    return;
+}
+
+/*void JsonValue::shortPrint() const{ //pass the command
+    if(typeToParse == STRING){
+        cout << stringVal << " ";
+    }
+    if(typeToParse == NUMBER){
+        cout << std::to_string(numberVal) << " ";
+    }
+    if(typeToParse == BOOLEAN){
+        cout << std::boolalpha << boolVal << " ";
+    }
+    if(typeToParse == NULLVAL){
+        cout << "null ";
+    }
+    if(typeToParse == OBJECT){
+        cout << "{ ";
+        //for (auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end(); ++it) {
+        for(const auto& key : objectVal.keysOrder){
+            cout << "Key: " <<  key << ", Value: ";
+            objectVal.objectMap.at(key).shortPrint();
+        }
+        cout << "} ";
+    }
+    if(typeToParse == ARRAY){
+        cout << " [";
+        for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
+            it->shortPrint();;
+            if(it != arrayVal.end()-1){
+                cout << ", ";
+            }
+        }
+        cout << " ]";
+    }
+    return;
+}*/

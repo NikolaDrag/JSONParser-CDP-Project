@@ -29,6 +29,7 @@ public:
     JsonValue& operator=(const JsonValue& other);
 
     void setTypeToParse(Type typeVal);
+
     Type getTypeval() const;
     string getStringval() const;
     double getNumberval() const;
@@ -36,7 +37,9 @@ public:
     JsonObject getObjectval() const;
     JsonArray getArrayval() const;
 
-    void print() const;
+    void print(const string & identation) const;
+    void exactPrint(const string & identation) const;
+    //void shortPrint() const;
 private:
     Type typeToParse;
     string stringVal;

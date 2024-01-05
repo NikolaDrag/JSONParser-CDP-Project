@@ -1,10 +1,5 @@
 #include "JsonValue.h"
 #include "JsonParser.h"
-#include <stack>
-
-using std::stack;
-using std::cin;
-
 
 int main(){
     //1vi char sled ( e 'space', toest na position[0]
@@ -12,7 +7,6 @@ int main(){
     "age": -30.90,
     "languages": "English"} )";
     JsonParser JsonParser1(jsonInput1);
-    JsonParser1.parse();
     JsonParser1.parseAndStoreJsonValue();
     JsonParser1.printStoredJsonValues();
 
@@ -55,9 +49,11 @@ int main(){
               )";
               //cout <<  jsonInput2[201] << jsonInput2[202] <<jsonInput2[203]<< jsonInput2[204];
     JsonParser JsonParser2(jsonInput2);
-    JsonParser2.parse();
     JsonParser2.parseAndStoreJsonValue();
     JsonParser2.printStoredJsonValues();
+    JsonParser2.shortPrintStoredJsonValues();
+    string testFileName = "TestJson1";
+    JsonParser2.saveToJsonFile(JsonParser2.getStoredValues(), testFileName);
     /*
     Notes: 1. parsing for legitamate input works, but care how "" are entered from user input with escape signs or not
     */
