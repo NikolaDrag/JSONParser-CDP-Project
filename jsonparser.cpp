@@ -14,6 +14,18 @@ JsonValue JsonParser::getStoredValues(){
         return storedValues;
 }
 
+void JsonParser::parseAndStoreJsonValue() {
+    position =0;
+    JsonValue parsedValue = parse(); 
+    //cout << parsedValue.getTypeval();
+    storedValues = parsedValue;
+    return;
+}
+
+void JsonParser::printStoredJsonValues() const {
+        storedValues.print();
+}
+
 JsonParser::JsonParser(string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
 
 JsonValue JsonParser::parse() {
@@ -81,13 +93,14 @@ JsonValue JsonParser::parseObject() {
             return JsonValue(obj);
         }
         string key = parseKey();
+        obj.keysOrder.push_back(key); //pushing key in order for the object
         skipSpaces(); //skip spaces mejdu kluch i :
         if(jsonInput[position] != ':'){
             throw std::invalid_argument("Invalid character in object at position: " + std::to_string(position) + ". Missing : after key.");
             return JsonValue(obj);
         }
         position++; //ako imame : go minavame
-        obj[key] = parse(); //connect key to next object, parse() will skip begining spaces
+        obj.objectMap[key] = parse(); //connect key to next object, parse() will skip begining spaces
         skipSpaces(); // value e -> space value space, pruviq space go skipvame s parse() vtoriq tuk, toest ne se skipvat vuv valuetata kato string etc.
         if(jsonInput[position] == '}'){ // proverqvame dali prikluchva obekta za da napravim proverka za zapetaq
             position++;
@@ -214,7 +227,7 @@ JsonValue JsonParser::parseArray() {
             position++;
             break;
         }
-        if(jsonInput[position] != ','){ //ako nqma zapetaq no i ne priluchva obekta, ako ima zapetaq cikula 
+        if(jsonInput[position] != ','){ //ako nqma zapetaq no i ne prikluchva obekta, ako ima zapetaq cikula 
         //shte produlji ako sled zapetaqta nqma kavichki za kluch shte vlezem v gorniq error
             throw std::invalid_argument("Invalid character in array at position: " + std::to_string(position) + ". Missing comma or invalid symbol.");
             return JsonValue(arr);

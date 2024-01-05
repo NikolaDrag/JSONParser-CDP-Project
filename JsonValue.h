@@ -1,20 +1,11 @@
 #ifndef JSONVALUE_H
 #define JSONVALUE_H
 
-#include <iostream>
-#include <map>
-#include <vector>
-#include <string>
-
-using std::string;
-using std::vector;
-using std::map;
-using std::cout;
-using std::endl;
+#include "JsonObject.h"
 
 class JsonValue;
 
-typedef map<string, JsonValue> JsonObject; //if vector has 1 Element it is string,number,boolean,null, otherwise its an array
+//typedef map<string, JsonValue> JsonObject; //if vector has 1 Element it is string,number,boolean,null, otherwise its an array
 typedef vector<JsonValue> JsonArray;
 
 class JsonValue { //izpolzva se za jsonObject i JsonArray
@@ -37,7 +28,6 @@ public:
 
     JsonValue& operator=(const JsonValue& other);
 
-    void setJsonObject(const JsonObject& newObj);
     void setTypeToParse(Type typeVal);
     Type getTypeval() const;
     string getStringval() const;

@@ -2,7 +2,7 @@
 
 JsonValue::JsonValue() : typeToParse(NULLVAL) {}
 
-JsonValue::JsonValue(const std::string& inputStr) : typeToParse(STRING), stringVal(inputStr) {}
+JsonValue::JsonValue(const string& inputStr) : typeToParse(STRING), stringVal(inputStr) {}
 
 JsonValue::JsonValue(const double& inputNumber) : typeToParse(NUMBER), numberVal(inputNumber) {}
 
@@ -67,10 +67,11 @@ void JsonValue::print() const{ //pass the command
     }
     if(typeToParse == OBJECT){
         cout << "{ " << endl;
-        for (auto it = objectVal.begin(); it != objectVal.end(); ++it) {
-            cout << "Key: " << it->first << ", Value: ";
-            cout << it->second.getTypeval();
-            it->second.print();
+        //for (auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end(); ++it) {
+        for(const auto& key : objectVal.keysOrder){
+            cout << "Key: " <<  key << ", Value: ";
+            //cout << it->second.getTypeval();
+            objectVal.objectMap.at(key).print();
             cout << endl;
         }
         cout << "} " << endl;
