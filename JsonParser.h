@@ -20,6 +20,7 @@ public:
     JsonValue getStoredValues();
 
     void parseAndStoreJsonValue();
+
     void printStoredJsonValues() const;
     void shortPrintStoredJsonValues() const;
     void exactPrintStoredJsonValues(const string & identation) const; //print according to jsonrules needed in file, just a different print style method
@@ -37,8 +38,7 @@ private:
     JsonValue parseNull();
     JsonValue parseNumber();
     JsonValue parseBool();
-    JsonValue parseArray();
-    
+    JsonValue parseArray();  
 };
 
 #endif 

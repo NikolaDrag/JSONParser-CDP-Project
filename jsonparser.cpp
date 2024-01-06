@@ -16,7 +16,7 @@ JsonValue JsonParser::getStoredValues(){
     return storedValues;
 }
 
-void JsonParser::parseAndStoreJsonValue() { //this parse should be used, so the normal parse() is liek a helper
+void JsonParser::parseAndStoreJsonValue() { //this parse should be used, so the normal parse() is like a helper
     position =0;
     JsonValue parsedValue; //for some readability
     while(jsonInput[position] != 0){ // avoid extra text
@@ -28,14 +28,17 @@ void JsonParser::parseAndStoreJsonValue() { //this parse should be used, so the 
 
 void JsonParser::printStoredJsonValues() const {
     storedValues.print("\n");
+    return;
 }
 
 void JsonParser::shortPrintStoredJsonValues() const {
     storedValues.print("");
+    return;
 }
 
 void JsonParser::exactPrintStoredJsonValues(const string & identation) const {
     storedValues.exactPrint(identation);
+    return;
 }
 
 void JsonParser::saveToJsonFile(const JsonValue& jsonData, string& fileName) {
@@ -46,7 +49,7 @@ void JsonParser::saveToJsonFile(const JsonValue& jsonData, string& fileName) {
         cin >> choice1;
         if (choice1 == 'C' || choice1 == 'c') {
             cout << "Enter a new file name: ";
-            cin >> fileName;
+            std::getline(cin, fileName);
         }
     }
     outputFile.open(fileName);
@@ -57,6 +60,7 @@ void JsonParser::saveToJsonFile(const JsonValue& jsonData, string& fileName) {
     char choice2;
     cout << "Enter desired identation (L)ong and readable or (S)hort: "; //console interface
     cin >> choice2;
+    cin.ignore(); // Clear the newline character from the buffer
     std::streambuf* coutBuffer = cout.rdbuf();   // Redirect cout to the file
     cout.rdbuf(outputFile.rdbuf());
     if(choice2 == 'L' || choice2 == 'l'){
@@ -264,7 +268,7 @@ JsonValue JsonParser::parseArray() {
             return JsonValue(arr);
         }
         arr.push_back(parse());
-        skipSpaces();// value e -> space value space, pruviq space go skipvame s parse() vtoriq tuk, toest ne se skipvat vuv valuetata kato string etc.
+        skipSpaces();// value e -> space value space, pruviqt space go skipvame s parse() vtoriq tuk, toest ne se skipvat vuv valuetata kato string etc.
         if(jsonInput[position] == ']'){
             position++;
             break;

@@ -126,37 +126,32 @@ void JsonValue::exactPrint(const string & identation) const{ //pass the command
     return;
 }
 
-/*void JsonValue::shortPrint() const{ //pass the command
-    if(typeToParse == STRING){
-        cout << stringVal << " ";
-    }
-    if(typeToParse == NUMBER){
-        cout << std::to_string(numberVal) << " ";
-    }
-    if(typeToParse == BOOLEAN){
-        cout << std::boolalpha << boolVal << " ";
-    }
-    if(typeToParse == NULLVAL){
-        cout << "null ";
-    }
+JsonValue JsonValue::findByKey(const string & keyValue){ //Shte izpolzvam rekursiven proces sus valueVector kato state variable
+    JsonArray valueVector;
+    findByKeyHelper(keyValue,valueVector);
+    return JsonValue(valueVector);
+}
+
+void JsonValue::findByKeyHelper(const string & keyValue,JsonArray &currArr){ //we will call this on the storedKeyVal in JsonParser
     if(typeToParse == OBJECT){
-        cout << "{ ";
-        //for (auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end(); ++it) {
         for(const auto& key : objectVal.keysOrder){
-            cout << "Key: " <<  key << ", Value: ";
-            objectVal.objectMap.at(key).shortPrint();
-        }
-        cout << "} ";
-    }
-    if(typeToParse == ARRAY){
-        cout << " [";
-        for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
-            it->shortPrint();;
-            if(it != arrayVal.end()-1){
-                cout << ", ";
+            if(key == keyValue){
+                currArr.push_back(objectVal.objectMap.at(key));
+            }
+            if(objectVal.objectMap.at(key).getTypeval() == OBJECT || objectVal.objectMap.at(key).getTypeval() == ARRAY){ //noting to push if its not in an object
+                objectVal.objectMap.at(key).findByKeyHelper(keyValue,currArr);
             }
         }
-        cout << " ]";
+    }
+    if(typeToParse == ARRAY){
+        for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
+            if(it->getTypeval() == OBJECT || it-> getTypeval() == ARRAY){ //nothing to look for if its not in an object or an array
+            it->findByKeyHelper(keyValue, currArr);
+            }
+        }
     }
     return;
-}*/
+}
+
+// // Push back vector2 into vector1
+    //vector1.push_back(vector2.begin(), vector2.end());

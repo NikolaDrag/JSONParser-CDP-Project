@@ -39,7 +39,9 @@ public:
 
     void print(const string & identation) const;
     void exactPrint(const string & identation) const;
-    //void shortPrint() const;
+
+    JsonValue findByKey(const string &keyValue);
+    void findByKeyHelper(const string & keyValue, JsonArray &currentArr);
 private:
     Type typeToParse;
     string stringVal;
