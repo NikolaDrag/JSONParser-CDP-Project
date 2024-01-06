@@ -153,5 +153,25 @@ void JsonValue::findByKeyHelper(const string & keyValue,JsonArray &currArr){ //w
     return;
 }
 
-// // Push back vector2 into vector1
-    //vector1.push_back(vector2.begin(), vector2.end());
+void JsonValue::saveToFile(string &fileName){
+    std::ofstream outputFile;
+    if (std::ifstream(fileName)) { // Check if the file already exists
+        char choice1;
+        cout << "File already exists. Do you want to (O)verwrite or (C)hange the name? "; //console interface
+        cin >> choice1;
+        if (choice1 == 'C' || choice1 == 'c') {
+            cout << "Enter a new file name: ";
+            std::getline(cin, fileName);
+        }
+    }
+    outputFile.open(fileName);
+    if (!outputFile.is_open()) {
+        cerr << "Error opening file for writing: " << fileName << endl;
+        return;
+    }
+    std::streambuf* coutBuffer = cout.rdbuf();   // Redirect cout to the file
+    cout.rdbuf(outputFile.rdbuf());
+    exactPrint("\n");
+    cout.rdbuf(coutBuffer);  // Restore cout to the original buffer
+    outputFile.close();
+}

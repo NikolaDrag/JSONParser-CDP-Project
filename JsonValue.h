@@ -2,6 +2,10 @@
 #define JSONVALUE_H
 
 #include "JsonObject.h"
+#include <fstream>
+
+using std::cin;
+using std::cerr;
 
 class JsonValue;
 
@@ -42,6 +46,8 @@ public:
 
     JsonValue findByKey(const string &keyValue);
     void findByKeyHelper(const string & keyValue, JsonArray &currentArr);
+
+    void saveToFile(string &fileName);
 private:
     Type typeToParse;
     string stringVal;

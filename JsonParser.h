@@ -2,9 +2,6 @@
 #define JSONPARSER_H
 
 #include "JsonValue.h"
-#include <fstream>
-
-using std::cin;
 
 class JsonParser {
 private:
@@ -25,7 +22,7 @@ public:
     void shortPrintStoredJsonValues() const;
     void exactPrintStoredJsonValues(const string & identation) const; //print according to jsonrules needed in file, just a different print style method
 
-    void saveToJsonFile(const JsonValue& jsonData, string& fileName);
+    void saveToJsonFile(string& fileName);
 
     JsonValue parse();
 private:

@@ -1,6 +1,5 @@
 #include "JsonParser.h"
 
-using std::cerr;
 
 bool JsonParser::isDigit(char chr){
     if(chr >= '0' && chr <= '9'){
@@ -19,6 +18,10 @@ JsonValue JsonParser::getStoredValues(){
 void JsonParser::parseAndStoreJsonValue() { //this parse should be used, so the normal parse() is like a helper
     position =0;
     JsonValue parsedValue; //for some readability
+    if(jsonInput[0] == 0){
+        throw std::invalid_argument("Invalid input: input is an empty string. ");
+        return;
+    }
     while(jsonInput[position] != 0){ // avoid extra text
         parsedValue = parse();
     }
@@ -41,7 +44,7 @@ void JsonParser::exactPrintStoredJsonValues(const string & identation) const {
     return;
 }
 
-void JsonParser::saveToJsonFile(const JsonValue& jsonData, string& fileName) {
+void JsonParser::saveToJsonFile(string& fileName) {
     std::ofstream outputFile;
     if (std::ifstream(fileName)) { // Check if the file already exists
         char choice1;
@@ -58,7 +61,7 @@ void JsonParser::saveToJsonFile(const JsonValue& jsonData, string& fileName) {
         return;
     }
     char choice2;
-    cout << "Enter desired identation (L)ong and readable or (S)hort: "; //console interface
+    cout << "Enter desired identation: (L)ong and readable or (S)hort: "; //console interface
     cin >> choice2;
     cin.ignore(); // Clear the newline character from the buffer
     std::streambuf* coutBuffer = cout.rdbuf();   // Redirect cout to the file
@@ -96,12 +99,13 @@ JsonValue JsonParser::parse() {
             return parseNull();
             break;
         case 0:
-            cerr << "Input is an empty string.";
+            throw std::invalid_argument("Invalid input: input is an empty string.");
             return JsonValue("");
             break;
         default:
             cerr << "Invalid input: unexpected character '" << jsonInput[position] << "' at position " << position << endl;
             throw std::invalid_argument("Invalid input: unexpected character at position " + std::to_string(position) + ".");
+            return JsonValue("");
             break;
         }
 }
