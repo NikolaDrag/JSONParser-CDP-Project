@@ -67,7 +67,6 @@ void JsonValue::print(const string & identation) const{ //pass the command
     }
     if(typeToParse == OBJECT){
         cout << "{ " << identation;
-        //for (auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end(); ++it) {
         for(const auto& key : objectVal.keysOrder){
             cout << "Key: " <<  key << ", Value: ";
             objectVal.objectMap.at(key).print(identation);
@@ -103,7 +102,6 @@ void JsonValue::exactPrint(const string & identation) const{ //pass the command
     if(typeToParse == OBJECT){
         cout << "{ " << identation;
         int counter =0;
-        //for (auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end(); ++it) {
         for(const auto& key : objectVal.keysOrder){
             cout << "\"" <<  key << "\"" << ":";
             objectVal.objectMap.at(key).exactPrint(identation);
@@ -132,21 +130,21 @@ JsonValue JsonValue::findByKey(const string & keyValue){ //Shte izpolzvam rekurs
     return JsonValue(valueVector);
 }
 
-void JsonValue::findByKeyHelper(const string & keyValue,JsonArray &currArr){ //we will call this on the storedKeyVal in JsonParser
+void JsonValue::findByKeyHelper(const string & keyValue,JsonArray &currArrOfMatchingVal){ //we will call this on the storedKeyVal in JsonParser
     if(typeToParse == OBJECT){
         for(const auto& key : objectVal.keysOrder){
             if(key == keyValue){
-                currArr.push_back(objectVal.objectMap.at(key));
+                currArrOfMatchingVal.push_back(objectVal.objectMap.at(key));
             }
             if(objectVal.objectMap.at(key).getTypeval() == OBJECT || objectVal.objectMap.at(key).getTypeval() == ARRAY){ //noting to push if its not in an object
-                objectVal.objectMap.at(key).findByKeyHelper(keyValue,currArr);
+                objectVal.objectMap.at(key).findByKeyHelper(keyValue,currArrOfMatchingVal);
             }
         }
     }
     if(typeToParse == ARRAY){
         for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
             if(it->getTypeval() == OBJECT || it-> getTypeval() == ARRAY){ //nothing to look for if its not in an object or an array
-            it->findByKeyHelper(keyValue, currArr);
+            it->findByKeyHelper(keyValue, currArrOfMatchingVal);
             }
         }
     }
@@ -174,4 +172,36 @@ void JsonValue::saveToFile(string &fileName){
     exactPrint("\n");
     cout.rdbuf(coutBuffer);  // Restore cout to the original buffer
     outputFile.close();
+}
+
+void JsonValue::deleteElementOnPath(const vector<string>& path, int trackPath){ //we pass the stored jsonvalue, trackPath starts at 0
+    if (path.empty()) {
+        cerr << "Invalid empty path." << endl;
+        return;
+    }
+    if(typeToParse == OBJECT){
+        for(auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end();){
+            if(*it == path[trackPath] && trackPath+1 == path.size()){ //if we are at the desired key
+                objectVal.keysOrder.erase(it);
+                return;
+            }
+            if(*it == path[trackPath]){
+                return objectVal.objectMap.at(*it).deleteElementOnPath(path,trackPath+1); //we continue on the right path
+            }
+        }
+    }
+    if(typeToParse == ARRAY){
+        int currentIndex =0;
+        for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it,currentIndex++) {
+            if(currentIndex == std::stod(path[trackPath]) && trackPath+1 == path.size()){ 
+                arrayVal.erase(it);
+                return;
+            }
+            if(currentIndex == std::stod(path[trackPath])){ 
+                return it->deleteElementOnPath(path,trackPath+1);
+            }
+        }
+    }
+    cerr << "Invalid path." << endl;
+    return;
 }

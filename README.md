@@ -7,3 +7,4 @@ Then you can enter the following commands to perform various tasks:
 
 1. Print/print -> print out the json in readable format to the console.
 2. Save to file/save to file -> save the json input in json format in a seperate file. Follow the prompted instructions.
+3. Find/find -> find all the bindings to a key and print them out or save them in a file.

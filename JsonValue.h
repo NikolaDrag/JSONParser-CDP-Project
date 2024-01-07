@@ -48,6 +48,9 @@ public:
     void findByKeyHelper(const string & keyValue, JsonArray &currentArr);
 
     void saveToFile(string &fileName);
+
+    void deleteElementOnPath(const vector<string>& fullPath, int trackFullPath);
+    //JsonValue findElementByPath(const vector<string> & path, int trackPath);
 private:
     Type typeToParse;
     string stringVal;
