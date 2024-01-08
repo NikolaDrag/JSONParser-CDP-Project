@@ -84,52 +84,5 @@ int main(){
             cout << "Invalid command please try again. ";
         }
     }
-
-    /*string jsonInput2 = R"({
-   "name":"ACME Software Co.",
-   "type":"Software Development Company",
-   "offices": [
-               {
-                   "name":"Headquarters",
-                   "address":"Sofia"
-               },
-               {
-                   "name":"Front Office",
-                   "address":"New York City"
-               }
-              ],
-   "members":[
-               {   
-                   "id" : "0",
-                   "name" : "John Smith",
-                   "birthdate" : "1980-01-01"
-               },
-               {
-                   "id" : "1",
-                   "name" : "Jane Smith",
-                   "birthdate" : "1981-02-02"
-               },
-               {
-                   "id" : "2",
-                   "name" : "John Doe",
-                   "birthdate" : "1982-03-03"
-               }
-           ],
-   "management":{
-                   "directorId":"0",
-                   "presidentId":"1"
-                }
- }
-
-              )";
-              //cout <<  jsonInput2[201] << jsonInput2[202] <<jsonInput2[203]<< jsonInput2[204];
-    JsonParser JsonParser2(jsonInput2);
-    JsonParser2.parseAndStoreJsonValue();
-    //JsonParser2.printStoredJsonValues();
-    //JsonParser2.shortPrintStoredJsonValues();
-    JsonParser2.getStoredValues().findByKey("name").print("");
-    //string testFileName = "TestJson1";
-    //JsonParser2.saveToJsonFile(JsonParser2.getStoredValues(), testFileName);*/
-   //{ "name":"John Doe","age":-30.900000,"languages":"English"} 
     return 0;
 }

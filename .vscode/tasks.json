@@ -7,9 +7,13 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "*.cpp",  // Compile all .cpp files in the folder
+                "JsonParser.cpp",
+                "JsonValue.cpp",
+                "main.cpp",
+                //"unitTests.cpp",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                "main.exe",
+                //"unitTests.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"

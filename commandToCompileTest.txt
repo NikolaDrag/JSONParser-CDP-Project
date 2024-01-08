@@ -1,0 +1,3 @@
+To build unit tests:
+
+g++ -fdiagnostics-color=always -g JsonParser.cpp JsonValue.cpp unitTests.cpp -o unitTests.exe
