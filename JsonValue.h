@@ -1,15 +1,28 @@
 #ifndef JSONVALUE_H
 #define JSONVALUE_H
 
-#include "JsonObject.h"
+#include <iostream>
+#include <map>
+#include <vector>
+#include <string>
 #include <fstream>
+#include <stdexcept>
 
+using std::string;
+using std::vector;
+using std::map;
+using std::cout;
+using std::endl;
 using std::cin;
 using std::cerr;
 
 class JsonValue;
 
-//typedef map<string, JsonValue> JsonObject; //if vector has 1 Element it is string,number,boolean,null, otherwise its an array
+struct JsonObject{
+    map<string, JsonValue> objectMap;
+    vector<string> keysOrder;
+};
+
 typedef vector<JsonValue> JsonArray;
 
 class JsonValue { //izpolzva se za jsonObject i JsonArray
@@ -44,10 +57,10 @@ public:
     void print(const string & identation) const;
     void exactPrint(const string & identation) const;
 
-    JsonValue findByKey(const string &keyValue);
-    void findByKeyHelper(const string & keyValue, JsonArray &currentArr);
+    JsonValue findByKey(const string &keyValue) const;
+    void findByKeyHelper(const string & keyValue, JsonArray &currentArr)const;
 
-    void saveToFile(string &fileName);
+    void saveToFile(string &fileName)const;
 
     void deleteElementOnPath(const vector<string>& fullPath, int trackFullPath);
     //JsonValue findElementByPath(const vector<string> & path, int trackPath);

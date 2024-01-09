@@ -9,7 +9,7 @@ Then you can enter the following commands to perform various tasks:
 1. Print/print -> print out the json in readable format to the console.
 2. Save to file/save to file -> save the json input in json format in a seperate file. Follow the prompted instructions.
 3. Find/find -> find all the bindings to a key and print them out or save them in a file.
-
+4. Delete/delete/Delete on path/delete on path -> enter a path and delete the element. If path is empty or incorrect you will get an invalid path message.
 
 We have the following classes: JsonParser and JsonValue. The main function is the console interface where we use the features of those classes.
 The .txt files testInputX, where X is in the range [1,2,3,4], we have test inputs which we read and we can test in the unitTests.cpp.

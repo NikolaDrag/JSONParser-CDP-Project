@@ -32,7 +32,7 @@ JsonValue::Type JsonValue::getTypeval() const {
     return typeToParse;
 }
 
-std::string JsonValue::getStringval() const {
+string JsonValue::getStringval() const {
     return stringVal;
 }
 
@@ -124,13 +124,13 @@ void JsonValue::exactPrint(const string & identation) const{ //pass the command
     return;
 }
 
-JsonValue JsonValue::findByKey(const string & keyValue){ //Shte izpolzvam rekursiven proces sus valueVector kato state variable
+JsonValue JsonValue::findByKey(const string & keyValue)const{ //Shte izpolzvam rekursiven proces sus valueVector kato state variable
     JsonArray valueVector;
     findByKeyHelper(keyValue,valueVector);
     return JsonValue(valueVector);
 }
 
-void JsonValue::findByKeyHelper(const string & keyValue,JsonArray &currArrOfMatchingVal){ //we will call this on the storedKeyVal in JsonParser
+void JsonValue::findByKeyHelper(const string & keyValue,JsonArray &currArrOfMatchingVal)const{ //we will call this on the storedKeyVal in JsonParser
     if(typeToParse == OBJECT){
         for(const auto& key : objectVal.keysOrder){
             if(key == keyValue){
@@ -151,7 +151,7 @@ void JsonValue::findByKeyHelper(const string & keyValue,JsonArray &currArrOfMatc
     return;
 }
 
-void JsonValue::saveToFile(string &fileName){
+void JsonValue::saveToFile(string &fileName)const{
     std::ofstream outputFile;
     if (std::ifstream(fileName)) { // Check if the file already exists
         char choice1;
@@ -180,9 +180,10 @@ void JsonValue::deleteElementOnPath(const vector<string>& path, int trackPath){ 
         return;
     }
     if(typeToParse == OBJECT){
-        for(auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end();){
+        for(auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end();it++){
             if(*it == path[trackPath] && trackPath+1 == path.size()){ //if we are at the desired key
-                objectVal.keysOrder.erase(it);
+                objectVal.objectMap.erase(*it);
+                objectVal.keysOrder.erase(it); 
                 return;
             }
             if(*it == path[trackPath]){
@@ -204,4 +205,4 @@ void JsonValue::deleteElementOnPath(const vector<string>& path, int trackPath){ 
     }
     cerr << "Invalid path." << endl;
     return;
-}
+} //!!! split this function into serach and delete, where search returns the element to be deleted

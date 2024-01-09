@@ -11,7 +11,7 @@ bool JsonParser::isDigit(char chr){
 
 JsonParser::JsonParser(string &jsonToParse) : jsonInput(jsonToParse), position(0) {}
 
-JsonValue JsonParser::getStoredValues(){
+JsonValue& JsonParser::getStoredValues(){ //need a & to change and delete we have const on other methods on JsonValue so it's fine 
     return storedValues;
 }
 
@@ -103,7 +103,6 @@ JsonValue JsonParser::parse() {
             return JsonValue("");
             break;
         default:
-            cerr << "Invalid input: unexpected character '" << jsonInput[position] << "' at position " << position << endl;
             throw std::invalid_argument("Invalid input: unexpected character at position " + std::to_string(position) + ".");
             return JsonValue("");
             break;
@@ -124,7 +123,7 @@ void JsonParser::skipSpaces() {
         return;
 }
 
-JsonValue JsonParser::parseObject() {
+JsonValue JsonParser::parseObject() { //if method is too long or perceived as unreadable we can quickly extract methods for the errors;
     position++; //za {
     skipSpaces(); //eventualni spaces mejdu { i key
     JsonObject obj;
@@ -142,6 +141,10 @@ JsonValue JsonParser::parseObject() {
             return JsonValue(obj);
         }
         string key = parseKey();
+        if (obj.objectMap.find(key) != obj.objectMap.end()) {
+            throw std::invalid_argument("Key already exists in object at position: " + std::to_string(position) + "."); //check if the key already exists
+            return JsonValue(obj);
+        }
         obj.keysOrder.push_back(key); //pushing key in order for the object
         skipSpaces(); //skip spaces mejdu kluch i :
         if(jsonInput[position] != ':'){
@@ -171,6 +174,10 @@ string JsonParser::parseKey() {
      string k ="";
         position++; // minavame  purvoto "
         while(jsonInput[position] != '"'){
+            if(jsonInput[position] == 0){
+                throw std::invalid_argument("Invalid character in key. Missing \" closing quotes.");
+                return k;
+            }
             if(jsonInput[position] == '\\'){
                 k.push_back(jsonInput[position]);
                 position++;
@@ -188,6 +195,9 @@ JsonValue JsonParser::parseString() {
     string s ="";
         position++; // minavame  purvoto "
         while(jsonInput[position] != '"'){
+            if(jsonInput[position] == 0){
+                throw std::invalid_argument("Invalid character in string. Missing \" closing quotes.");
+            }
             if(jsonInput[position] == '\\'){
                 s.push_back(jsonInput[position]); //push the escape char
                 position++; //skip the escape char 

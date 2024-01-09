@@ -14,7 +14,7 @@ public:
 
     JsonParser(string &jsonToParse);
 
-    JsonValue getStoredValues();
+    JsonValue &getStoredValues();
 
     void parseAndStoreJsonValue();
 
