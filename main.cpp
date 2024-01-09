@@ -2,6 +2,11 @@
 #include "JsonParser.h"
 #include <sstream>
 
+void exitProgram(){
+    cout << "Exiting the program." << endl;
+    std::exit(EXIT_SUCCESS);
+}
+
 void saveToFileCommand(JsonParser &parser1){
     cout << "Please enter your desired filename: ";
     string fileName;
@@ -75,18 +80,22 @@ void deleteCommand(JsonParser &parser1){
     cout << "Enter path (with spaces in between keys, indecies): ";
     fillPath(path);
     try{
-        parser1.getStoredValues().deleteElementOnPath(path,0);
+        string plh ="";
+        parser1.getStoredValues().findElementByPath(path,0,"delete",parser1.getStoredValues(),plh); //4th  adn 5thargument is a placeholder here
     }
     catch(const std::exception& ex){
-        cerr << "Invalid input. Not a number entered in an array in path." << endl;
+        if(ex.what() == "stod"){
+                cerr << "Not a number in array in path. " << endl;
+            }else{
+                cerr << ex.what() << endl;
+        }
     }
     return;
 }
 
-int main(){
-    //for console interface - map of function pointers if too many commands, for now we can do swtich/if,elseif...
+JsonParser enterParser(){
     cout << "Enter the JSON string (press enter twice to submit):\n"; //we dont have a submit button
-    string jsonInput1;
+    string jsonInput1 ="";
     string line;
     while (std::getline(cin, line) && !line.empty()) {//std::getline(cin, jsonInput1);
         jsonInput1 += line + "\n";
@@ -99,23 +108,89 @@ int main(){
             validInput = true;
         }
         catch(const std::exception& ex){
+            jsonInput1 ="";
             if(ex.what() == "stod"){
                 cerr << "Not a number, wrong number value in input. " << endl;
             }else{
                 cerr << ex.what() << endl;
             }
-            cout << "Enter a valid JSON string (press enter twice to submit) (type 'exit' to quit) : \n";
+            cout << "Enter a valid JSON string (type 'exit' to quit) (press enter twice to submit) : \n";
             while (std::getline(cin, line) && !line.empty()) {//std::getline(cin, jsonInput1);
                 jsonInput1 += line + "\n";
             }
-            if (jsonInput1 == "exit" || jsonInput1 == "Exit") {
-                cout << "Exiting the program." << endl;
-                return 0;
+            if (jsonInput1 == "exit\n" || jsonInput1 == "Exit\n") {
+                exitProgram();
             }
             JsonParser1 = JsonParser(jsonInput1);
-            JsonParser1.parseAndStoreJsonValue();
         }
     }
+    return JsonParser1;
+}
+
+void changeCommand(JsonParser &parser1){
+    vector<string> path;
+    cout << "Enter path (with spaces in between keys, indecies): ";
+    fillPath(path);
+    JsonParser parserToInsert = enterParser();
+    try{
+        string plh ="";
+        parser1.getStoredValues().findElementByPath(path,0,"change",parserToInsert.getStoredValues(),plh); //5th argument is a placeholder
+    }
+    catch(const std::exception& ex){
+        if(ex.what() == "stod"){
+                cerr << "Not a number in array in path. " << endl;
+            }else{
+                cerr << ex.what() << endl;
+        }
+    }
+    return;
+}
+
+void savePathCommand(JsonParser &parser1){
+    cout << "Enter desired filename: ";
+    string fileName;
+    std::getline(cin, fileName);
+    vector<string> path;
+    cout << "Enter path (with spaces in between keys, indecies): ";
+    fillPath(path);
+    try{
+        string plh ="";
+        parser1.getStoredValues().findElementByPath(path,0,"save",parser1.getStoredValues(),fileName);
+    }
+    catch(const std::exception& ex){
+        if(ex.what() == "stod"){
+                cerr << "Not a number in array in path. " << endl;
+            }else{
+                cerr << ex.what() << endl;
+        }
+    }
+    return;
+}
+
+void insertCommand(JsonParser &parser1){
+    vector<string> path;
+    cout << "Enter path (with spaces in between keys, indecies): ";
+    fillPath(path);
+    JsonParser parserToInsert = enterParser();
+    try{
+        cout << "Enter a key if you want to insert in a JSON Object.";
+        string key ="";
+        std::getline(cin,key);
+        parser1.getStoredValues().createAnElement(path,0,key,parserToInsert.getStoredValues());
+    }
+    catch(const std::exception& ex){
+        if(ex.what() == "stod"){
+                cerr << "Not a number in array in path. " << endl;
+            }else{
+                cerr << ex.what() << endl;
+        }
+    }
+    return;
+}
+
+int main(){
+    //for console interface - map of function pointers if too many commands, for now we can do swtich/if,elseif...
+    JsonParser JsonParser1 = enterParser();
     while (true) {
         cout << "Enter a command (type 'exit' to quit): ";
         string command;
@@ -132,11 +207,19 @@ int main(){
         else if(command == "delete on path" || command == "Delete on path" || command == "delete" || command == "Delete"){
             deleteCommand(JsonParser1);
         }
+        else if(command == "change element" || command == "Change element" || command == "Change" || command == "change"){
+            changeCommand(JsonParser1);
+        }
+        else if(command == "save on path" ||command == "Save on path" ||command == "save path" ||command == "Save path"){
+            savePathCommand(JsonParser1);
+        }
+        else if(command == "insert" || command == "Insert"){
+            insertCommand(JsonParser1);
+        }
         else if (command == "exit" || command == "Exit") {
-            cout << "Exiting the program." << endl;
-            return 0;
-            //break;
-        }else{
+            exitProgram();
+        }
+        else{
             cout << "Invalid command please try again. " << endl;
         }
     }

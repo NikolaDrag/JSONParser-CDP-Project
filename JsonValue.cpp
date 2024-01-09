@@ -52,74 +52,74 @@ JsonArray JsonValue::getArrayval() const {
     return arrayVal;
 }
 
-void JsonValue::print(const string & identation) const{ //pass the command
+void JsonValue::print(const string & indentation) const{ //pass the command
     if(typeToParse == STRING){
-        cout << stringVal << identation;
+        cout << stringVal << indentation;
     }
     if(typeToParse == NUMBER){
-        cout << std::to_string(numberVal) << identation;
+        cout << std::to_string(numberVal) << indentation;
     }
     if(typeToParse == BOOLEAN){
-        cout << std::boolalpha << boolVal << identation;
+        cout << std::boolalpha << boolVal << indentation;
     }
     if(typeToParse == NULLVAL){
-        cout << "null" << identation;
+        cout << "null" << indentation;
     }
     if(typeToParse == OBJECT){
-        cout << "{ " << identation;
+        cout << "{ " << indentation;
         for(const auto& key : objectVal.keysOrder){
             cout << "Key: " <<  key << ", Value: ";
-            objectVal.objectMap.at(key).print(identation);
+            objectVal.objectMap.at(key).print(indentation);
         }
-        cout << "} " << identation;
+        cout << "} " << indentation;
     }
     if(typeToParse == ARRAY){
-        cout << "[" << identation;
+        cout << "[" << indentation;
         for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
-            it->print(identation);
+            it->print(indentation);
             if(it != arrayVal.end()-1){
-                cout << "," << identation;
+                cout << "," << indentation;
             }
         }
-        cout << "]" << identation;
+        cout << "]" << indentation;
     }
     return;
 }
 
-void JsonValue::exactPrint(const string & identation) const{ //pass the command
+void JsonValue::exactPrint(const string & indentation) const{ //pass the command
     if(typeToParse == STRING){
-        cout << "\"" << stringVal << "\"" << identation;
+        cout << "\"" << stringVal << "\"" ;
     }
     if(typeToParse == NUMBER){
-        cout << std::to_string(numberVal) << identation;
+        cout << std::to_string(numberVal) ;
     }
     if(typeToParse == BOOLEAN){
-        cout << std::boolalpha << boolVal << identation;
+        cout << std::boolalpha << boolVal ;
     }
     if(typeToParse == NULLVAL){
-        cout << "null" << identation;
+        cout << "null" ;
     }
     if(typeToParse == OBJECT){
-        cout << "{ " << identation;
+        cout << "{ " << indentation;
         int counter =0;
         for(const auto& key : objectVal.keysOrder){
             cout << "\"" <<  key << "\"" << ":";
-            objectVal.objectMap.at(key).exactPrint(identation);
+            objectVal.objectMap.at(key).exactPrint(indentation);
             if (++counter < objectVal.keysOrder.size()) {
-                cout << "," << identation;
+                cout << "," << indentation;
             }
         }
-        cout << "} " << identation;
+        cout << "} " << indentation;
     }
     if(typeToParse == ARRAY){
-        cout << "[" << identation;
+        cout << "[" << indentation;
         for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
-            it->exactPrint(identation);
+            it->exactPrint(indentation);
             if(it != arrayVal.end()-1){
-                cout << "," << identation;
+                cout << "," << indentation;
             }
         }
-        cout << "]" << identation;
+        cout << "]" << indentation;
     }
     return;
 }
@@ -157,6 +157,7 @@ void JsonValue::saveToFile(string &fileName)const{
         char choice1;
         cout << "File already exists. Do you want to (O)verwrite or (C)hange the name? "; //console interface
         cin >> choice1;
+        cin.ignore();
         if (choice1 == 'C' || choice1 == 'c') {
             cout << "Enter a new file name: ";
             std::getline(cin, fileName);
@@ -174,20 +175,30 @@ void JsonValue::saveToFile(string &fileName)const{
     outputFile.close();
 }
 
-void JsonValue::deleteElementOnPath(const vector<string>& path, int trackPath){ //we pass the stored jsonvalue, trackPath starts at 0
+void JsonValue::findElementByPath(const vector<string> & path, int trackPath,const string &command,JsonValue &newValue,string &fileName){ //we parse it and then we asign if parse is correct
     if (path.empty()) {
-        cerr << "Invalid empty path." << endl;
+        throw std::invalid_argument("Invalid empty path.");
         return;
     }
     if(typeToParse == OBJECT){
         for(auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end();it++){
             if(*it == path[trackPath] && trackPath+1 == path.size()){ //if we are at the desired key
-                objectVal.objectMap.erase(*it);
-                objectVal.keysOrder.erase(it); 
-                return;
+                if(command == "delete"){
+                    objectVal.objectMap.erase(*it);
+                    objectVal.keysOrder.erase(it); 
+                    return;
+                }
+                if(command == "change"){
+                    objectVal.objectMap[*it] = newValue;
+                    return;
+                }
+                if(command == "save"){
+                    objectVal.objectMap[*it].saveToFile(fileName);
+                    return;
+                }
             }
             if(*it == path[trackPath]){
-                return objectVal.objectMap.at(*it).deleteElementOnPath(path,trackPath+1); //we continue on the right path
+                return objectVal.objectMap.at(*it).findElementByPath(path,trackPath+1,command,newValue,fileName);
             }
         }
     }
@@ -195,14 +206,57 @@ void JsonValue::deleteElementOnPath(const vector<string>& path, int trackPath){ 
         int currentIndex =0;
         for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it,currentIndex++) {
             if(currentIndex == std::stod(path[trackPath]) && trackPath+1 == path.size()){ 
-                arrayVal.erase(it);
-                return;
+                if(command == "delete"){
+                    arrayVal.erase(it);
+                    return;
+                }
+                if(command == "change"){
+                    *it = newValue;
+                    return;
+                }
+                if(command == "save"){
+                    (*it).saveToFile(fileName);
+                    return;
+                }
             }
             if(currentIndex == std::stod(path[trackPath])){ 
-                return it->deleteElementOnPath(path,trackPath+1);
+                return it->findElementByPath(path,trackPath+1,command,newValue,fileName);
             }
         }
     }
-    cerr << "Invalid path." << endl;
+    throw std::invalid_argument("Invalid path.");
     return;
-} //!!! split this function into serach and delete, where search returns the element to be deleted
+}
+
+void JsonValue::createAnElement(const vector<string> & path, int trackPath,const string &newKey,JsonValue &newValue){
+    if (path.empty()) {
+        throw std::invalid_argument("Invalid empty path.");
+        return;
+    }
+    if(typeToParse == OBJECT){
+        for(auto it = objectVal.keysOrder.begin(); it != objectVal.keysOrder.end();it++){
+            if(*it == path[trackPath] && trackPath+1 == path.size()){
+                objectVal.objectMap[newKey] = newValue;
+                objectVal.keysOrder.push_back(newKey); 
+                return;
+            }
+            if(*it == path[trackPath]){
+                return objectVal.objectMap.at(*it).createAnElement(path,trackPath+1,newKey,newValue);
+            }
+        }
+    }
+    if(typeToParse == ARRAY){
+        int currentIndex =0;
+        for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it,currentIndex++) {
+            if(currentIndex == std::stod(path[trackPath]) && trackPath+1 == path.size()){
+                arrayVal.insert(it,newValue); //insert new value in array at specified position
+                return;
+            }
+            if(currentIndex == std::stod(path[trackPath])){ 
+                return it->createAnElement(path,trackPath+1,newKey,newValue);
+            }
+        }
+    }
+    throw std::invalid_argument("Invalid path.");
+    return;
+}

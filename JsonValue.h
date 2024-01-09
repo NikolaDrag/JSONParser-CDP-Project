@@ -62,8 +62,8 @@ public:
 
     void saveToFile(string &fileName)const;
 
-    void deleteElementOnPath(const vector<string>& fullPath, int trackFullPath);
-    //JsonValue findElementByPath(const vector<string> & path, int trackPath);
+    void findElementByPath(const vector<string> & path, int trackPath,const string &command,JsonValue &newValue,string &fileName); //depending on command we use it for delete, change, etc.
+    void createAnElement(const vector<string> & path, int trackPath,const string &newKey,JsonValue &newValue);
 private:
     Type typeToParse;
     string stringVal;

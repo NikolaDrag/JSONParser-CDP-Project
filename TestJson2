@@ -1,3 +1,5 @@
-[
-"John Doe"
-]
+{ 
+"name":"Front Office"
+,
+"address":"New York City"
+} 
