@@ -54,8 +54,8 @@ public:
     JsonObject getObjectval() const;
     JsonArray getArrayval() const;
 
-    void print(const string & identation) const;
-    void exactPrint(const string & identation) const;
+    void print(const string & identation) const; //use for key matches or for short print if we pass "" identation
+    void exactPrint( string & identation) const; //print according to json and print readable
 
     JsonValue findByKey(const string &keyValue) const;
     void findByKeyHelper(const string & keyValue, JsonArray &currentArr)const;

@@ -54,16 +54,16 @@ JsonArray JsonValue::getArrayval() const {
 
 void JsonValue::print(const string & indentation) const{ //pass the command
     if(typeToParse == STRING){
-        cout << stringVal << indentation;
+        cout << stringVal;
     }
     if(typeToParse == NUMBER){
-        cout << std::to_string(numberVal) << indentation;
+        cout << std::to_string(numberVal);
     }
     if(typeToParse == BOOLEAN){
-        cout << std::boolalpha << boolVal << indentation;
+        cout << std::boolalpha << boolVal;
     }
     if(typeToParse == NULLVAL){
-        cout << "null" << indentation;
+        cout << "null";
     }
     if(typeToParse == OBJECT){
         cout << "{ " << indentation;
@@ -86,7 +86,7 @@ void JsonValue::print(const string & indentation) const{ //pass the command
     return;
 }
 
-void JsonValue::exactPrint(const string & indentation) const{ //pass the command
+void JsonValue::exactPrint(string & indentation) const{ //this will be the good print when we pass "\n"
     if(typeToParse == STRING){
         cout << "\"" << stringVal << "\"" ;
     }
@@ -100,7 +100,9 @@ void JsonValue::exactPrint(const string & indentation) const{ //pass the command
         cout << "null" ;
     }
     if(typeToParse == OBJECT){
-        cout << "{ " << indentation;
+        cout << "{ ";
+        indentation = indentation + " ";
+        cout<< indentation;
         int counter =0;
         for(const auto& key : objectVal.keysOrder){
             cout << "\"" <<  key << "\"" << ":";
@@ -109,17 +111,21 @@ void JsonValue::exactPrint(const string & indentation) const{ //pass the command
                 cout << "," << indentation;
             }
         }
-        cout << "} " << indentation;
+        indentation.pop_back();
+        cout << indentation << "} ";
     }
     if(typeToParse == ARRAY){
-        cout << "[" << indentation;
+        cout << "[";
+        indentation.push_back('\t');
+        cout<< indentation;
         for (auto it = arrayVal.begin(); it != arrayVal.end(); ++it) {
             it->exactPrint(indentation);
             if(it != arrayVal.end()-1){
                 cout << "," << indentation;
             }
         }
-        cout << "]" << indentation;
+        indentation.pop_back();
+        cout << indentation <<"]" ;
     }
     return;
 }
@@ -170,7 +176,8 @@ void JsonValue::saveToFile(string &fileName)const{
     }
     std::streambuf* coutBuffer = cout.rdbuf();   // Redirect cout to the file
     cout.rdbuf(outputFile.rdbuf());
-    exactPrint("\n");
+    string indent = "\n";
+    exactPrint(indent);
     cout.rdbuf(coutBuffer);  // Restore cout to the original buffer
     outputFile.close();
 }

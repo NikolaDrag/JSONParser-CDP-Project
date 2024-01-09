@@ -20,7 +20,7 @@ public:
 
     void printStoredJsonValues() const;
     void shortPrintStoredJsonValues() const;
-    void exactPrintStoredJsonValues(const string & identation) const; //print according to jsonrules needed in file, just a different print style method
+    void exactPrintStoredJsonValues( string & identation)const; //print according to jsonrules needed in file, just a different print style method
 
     void saveToJsonFile(string& fileName);
 

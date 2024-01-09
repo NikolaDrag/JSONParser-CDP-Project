@@ -30,7 +30,8 @@ void JsonParser::parseAndStoreJsonValue() { //this parse should be used, so the 
 }
 
 void JsonParser::printStoredJsonValues() const {
-    storedValues.print("\n");
+    string indent = "\n";
+    storedValues.exactPrint(indent);
     return;
 }
 
@@ -39,8 +40,8 @@ void JsonParser::shortPrintStoredJsonValues() const {
     return;
 }
 
-void JsonParser::exactPrintStoredJsonValues(const string & identation) const {
-    storedValues.exactPrint(identation);
+void JsonParser::exactPrintStoredJsonValues(string & indentation)const{
+    storedValues.exactPrint(indentation);
     return;
 }
 
@@ -61,15 +62,18 @@ void JsonParser::saveToJsonFile(string& fileName) {
         return;
     }
     char choice2;
-    cout << "Enter desired identation: (L)ong and readable or (S)hort: "; //console interface
+    cout << "Enter desired indentation: (L)ong and readable or (S)hort: "; //console interface
     cin >> choice2;
     cin.ignore(); // Clear the newline character from the buffer
     std::streambuf* coutBuffer = cout.rdbuf();   // Redirect cout to the file
     cout.rdbuf(outputFile.rdbuf());
+    string indent;
     if(choice2 == 'L' || choice2 == 'l'){
-        exactPrintStoredJsonValues("\n");
+        indent = "\n";
+        exactPrintStoredJsonValues(indent);
     }else{ //if its 'S' or 's'
-        exactPrintStoredJsonValues("");
+        indent = "";
+        exactPrintStoredJsonValues(indent);
     }
     cout.rdbuf(coutBuffer);  // Restore cout to the original buffer
     outputFile.close();

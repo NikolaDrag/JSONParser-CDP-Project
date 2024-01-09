@@ -196,7 +196,8 @@ int main(){
         string command;
         std::getline(cin, command);
         if(command == "Print" || command == "print"){
-            JsonParser1.printStoredJsonValues();
+            JsonParser1.printStoredJsonValues(); 
+            cout << endl;
         }
         else if(command == "Save to file" || command == "save to file"){
             saveToFileCommand(JsonParser1);
